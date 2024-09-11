@@ -1,17 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
-import NumCorrectCellsContext from "./NumCorrectCellsContext";
+import GridSettingsContext from "./GridSettingsContext";
 
-const Cell = ({ partOfAnswer }) => {
+const Cell = ({ partOfAnswer, answer }) => {
   const [selected, setSelected] = useState(false);
 
-  const { solved, onCorrectCellSelected, onIncorrectCellSelected } = useContext(
-    NumCorrectCellsContext
-  );
-
-  const classname =
-    "flex justify-center items-center w-16 h-16 border-gray-300 border-2 cursor-pointer";
-  const solvedClassname =
-    "flex justify-center items-center w-16 h-16 border-gray-300 border-2 cursor-pointer";
+  const { solved, onCorrectCellSelected, onIncorrectCellSelected } =
+    useContext(GridSettingsContext);
 
   const cellClassname = "w-full h-full bg-blue-600";
   const solvedCellClassname = "w-full h-full bg-green-500";
@@ -27,6 +21,10 @@ const Cell = ({ partOfAnswer }) => {
   };
 
   useEffect(() => {
+    setSelected(false);
+  }, [answer]);
+
+  useEffect(() => {
     if (solved) {
       setSelected(partOfAnswer);
     }
@@ -34,7 +32,7 @@ const Cell = ({ partOfAnswer }) => {
 
   return (
     <div
-      className={solved && partOfAnswer ? solvedClassname : classname}
+      className="flex justify-center items-center w-16 h-16 border-gray-300 border-2 cursor-pointer"
       onMouseDown={() => onMouseDownEvent()}
     >
       {selected && (

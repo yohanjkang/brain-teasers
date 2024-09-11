@@ -9,7 +9,7 @@ const Top = ({ numCols, hints, hintLength }) => {
       {hints.map((hint, index) => (
         <div
           key={index}
-          className="top-hint flex flex-col justify-end items-center space-y-2 pb-1 w-16 border-gray-300 border-2 text-4xl font-bold"
+          className="top-hint flex flex-col justify-end items-center space-y-3 pb-1 w-16 border-gray-300 border-2 text-4xl font-bold"
           style={{ "--height": hintLength }}
         >
           {hint.map((num, index) => {

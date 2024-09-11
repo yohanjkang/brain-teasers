@@ -1,44 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Grid from "./components/Grid";
 import Left from "./components/Left";
 import Top from "./components/Top";
 import SettingsPanel from "./components/SettingsPanel";
-import NumCorrectCellsContext from "./components/NumCorrectCellsContext";
-import { generateGrid } from "./components/GridManager";
-
-const countSequences = (answer, gridSize, isRow) => {
-  console.log(answer);
-
-  let count = 0;
-  let result = Array.from({ length: gridSize }, () => []);
-
-  for (let i = 0; i < answer.length; i++) {
-    count = 0;
-    for (let j = 0; j < answer.length; j++) {
-      let value = isRow ? answer[i][j] : answer[j][i];
-      if (value === 1) {
-        count++;
-      } else {
-        if (count > 0) {
-          result[i].push(count);
-        }
-        count = 0;
-      }
-    }
-    if (count > 0) {
-      result[i].push(count);
-    } else {
-      if (result[i].length === 0) {
-        result[i].push(0);
-      }
-    }
-  }
-
-  return result;
-};
+import GridSettingsContext from "./components/GridSettingsContext";
+import { countSequences, generateGrid } from "./components/GridManager";
 
 function App() {
-  const [gridSize, setGridSize] = useState({ rows: 6, columns: 6 });
+  const [gridSize, setGridSize] = useState({ rows: 10, columns: 10 });
   const [answer, setAnswer] = useState(null);
   const [solved, setSolved] = useState(false);
   const [topHintLength, setTopHintLength] = useState(1);
@@ -49,12 +18,14 @@ function App() {
   const [numIncorrect, setNumIncorrect] = useState(0);
 
   const generateNewGrid = useCallback(() => {
+    setSolved(false);
     setAnswer(generateGrid(gridSize.rows, gridSize.columns));
+
+    console.log("Generating new game");
   }, [gridSize.columns, gridSize.rows]);
 
   const solveGrid = () => {
     setSolved(true);
-    console.log(solved);
   };
 
   const onCorrectCellSelected = (selected) => {
@@ -65,6 +36,19 @@ function App() {
     setNumIncorrect(numIncorrect + (selected ? 1 : -1));
   };
 
+  // Prevent dragging since it causes odd behaviour when dragging the grid
+  useEffect(() => {
+    const preventDrag = (e) => {
+      e.preventDefault();
+    };
+
+    document.addEventListener("dragstart", preventDrag);
+
+    return () => {
+      document.removeEventListener("dragstart", preventDrag);
+    };
+  }, []);
+
   useEffect(() => {
     generateNewGrid();
   }, [generateNewGrid]);
@@ -72,15 +56,15 @@ function App() {
   useEffect(() => {
     if (!answer) return;
 
-    const topHints = countSequences(answer, gridSize.columns, false);
-    const leftHints = countSequences(answer, gridSize.rows, true);
+    const topHints = countSequences(answer, gridSize, false);
+    const leftHints = countSequences(answer, gridSize, true);
 
     setTopHints(topHints);
     setLeftHints(leftHints);
 
     setTopHintLength(Math.max(...topHints.map((row) => row.length)));
     setLeftHintLength(Math.max(...leftHints.map((col) => col.length)));
-  }, [answer, gridSize.columns, gridSize.rows]);
+  }, [answer, gridSize]);
 
   useEffect(() => {
     if (!answer) return;
@@ -100,29 +84,31 @@ function App() {
   }
 
   return (
-    <NumCorrectCellsContext.Provider
+    <GridSettingsContext.Provider
       value={{ solved, onCorrectCellSelected, onIncorrectCellSelected }}
     >
-      <div className="flex relative justify-center items-center h-[100vh] w-full bg-gray-950">
+      <div className="flex items-center justify-between h-[100vh] w-full bg-gray-950">
+        <div className="flex flex-grow justify-center items-center">
+          <div className="relative scale-75">
+            <Top
+              numCols={gridSize.columns}
+              hints={topHints}
+              hintLength={topHintLength}
+            />
+            <Left
+              numRows={gridSize.rows}
+              hints={leftHints}
+              hintLength={leftHintLength}
+            />
+            <Grid gridSize={gridSize} answer={answer} />
+          </div>
+        </div>
         <SettingsPanel
           generateNewGrid={generateNewGrid}
           solveGrid={solveGrid}
         />
-        <div className="relative">
-          <Top
-            numCols={gridSize.columns}
-            hints={topHints}
-            hintLength={topHintLength}
-          />
-          <Left
-            numRows={gridSize.rows}
-            hints={leftHints}
-            hintLength={leftHintLength}
-          />
-          <Grid gridSize={gridSize} answer={answer} />
-        </div>
       </div>
-    </NumCorrectCellsContext.Provider>
+    </GridSettingsContext.Provider>
   );
 }
 

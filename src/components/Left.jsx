@@ -9,7 +9,7 @@ const Left = ({ numRows, hints, hintLength }) => {
       {hints.map((hint, index) => (
         <div
           key={index}
-          className="left-hint flex flex-row justify-end items-center space-x-3 h-16 pr-1 border-gray-300 border-2 text-4xl font-bold"
+          className="left-hint flex flex-row justify-end items-center space-x-6 h-16 pr-2 border-gray-300 border-2 text-4xl font-bold"
           style={{ "--width": hintLength }}
         >
           {hint.map((num, index) => {
