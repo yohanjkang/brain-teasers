@@ -10,6 +10,14 @@ export const generateGrid = (rows, columns) => {
   return newGrid;
 };
 
+export const createGrid = (gridSize) => {
+  const newGrid = Array.from({ length: gridSize.rows }, () => {
+    return Array.from({ length: gridSize.columns }, () => false);
+  });
+
+  return newGrid;
+};
+
 export const countSequences = (answer, gridSize, isRow) => {
   const primaryAxis = isRow ? gridSize.rows : gridSize.columns;
   const secondaryAxis = isRow ? gridSize.columns : gridSize.rows;

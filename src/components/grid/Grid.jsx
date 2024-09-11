@@ -12,6 +12,7 @@ const Grid = ({ gridSize, answer }) => {
             key={`${rowIndex}-${colIndex}`}
             partOfAnswer={answer[rowIndex][colIndex] === 1}
             answer={answer}
+            gridCoordinate={{ row: rowIndex, column: colIndex }}
           />
         );
       });

@@ -1,11 +1,10 @@
 import React, { useState, useContext, useEffect } from "react";
-import GridSettingsContext from "./GridSettingsContext";
+import GridSettingsContext from "../GridSettingsContext";
 
-const Cell = ({ partOfAnswer, answer }) => {
+const Cell = ({ partOfAnswer, answer, gridCoordinate }) => {
   const [selected, setSelected] = useState(false);
 
-  const { solved, onCorrectCellSelected, onIncorrectCellSelected } =
-    useContext(GridSettingsContext);
+  const { solved, onCellSelected } = useContext(GridSettingsContext);
 
   const cellClassname = "w-full h-full bg-blue-600";
   const solvedCellClassname = "w-full h-full bg-green-500";
@@ -13,11 +12,7 @@ const Cell = ({ partOfAnswer, answer }) => {
   const onMouseDownEvent = () => {
     setSelected(!selected);
 
-    if (partOfAnswer) {
-      onCorrectCellSelected(!selected);
-    } else {
-      onIncorrectCellSelected(!selected);
-    }
+    onCellSelected(!selected, partOfAnswer, gridCoordinate);
   };
 
   useEffect(() => {
